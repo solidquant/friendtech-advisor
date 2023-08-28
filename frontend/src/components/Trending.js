@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 
-const Trending = () => {
+const Trending = ({ socket }) => {
+    useEffect(() => {
+        socket.on('event', (evt) => {
+            console.log(evt);
+        })
+    }, [socket]);
+
     return (
         <div className="Trending">
             <div className="title">🔥 Trending</div>

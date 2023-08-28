@@ -43,5 +43,7 @@ lib/
 
 # Bot
 .cached-trades.csv
+.shares.npy
+.db.pkl
 
 __pycache__/
