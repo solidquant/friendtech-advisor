@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+* {
+  font-family: Roboto, sans-serif;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+}
+
+.App {
+  margin: 1rem;
+}
+
+.Navbar {
+  width: 100%;
+  padding: 1rem 1rem 2rem 1rem;
+  text-align: center;
+  font-size: 2.2rem;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.title {
+  width: 90%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.Stats {
+  padding: 1rem 0;
+  width: 100%;
+  height: 25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Stats .user-chart {
+  width: 90%;
+  height: 100%;
+}
+
+.Trending {
+  padding: 1rem 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Trending .items {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.SubjectItem {
+  width: 90%;
+  border: 1px solid black;
+}
+
+@media screen and (min-width: 750px) {
+  html {
+    display: flex;
+    justify-content: center;
+  }
+
+  .App {
+    width: 750px;
+  }
+}

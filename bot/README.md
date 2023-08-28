@@ -1,0 +1,1 @@
+# Friend.tech Sniper Bot
