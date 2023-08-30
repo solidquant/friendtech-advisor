@@ -1,11 +1,10 @@
-import os
-import pickle
+import math
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from typing import Dict, List
 from operator import itemgetter
+from typing import Any, Dict, List
 
 from constants import _DIR
 from subjects import Trade
@@ -30,6 +29,25 @@ def get_cached_trades_array() -> np.ndarray:
     trades = pd.read_csv(_DIR / '.cached-trades.csv', low_memory=False)
     trades_array = trades.values
     return trades_array
+
+
+def get_cached_users_dict(trades_array: np.ndarray or None) -> Dict[str, Any]:
+    if type(trades_array) == type(None):
+        trades_array = get_cached_trades_array()
+    users = {
+        'users': {},
+        'users_cnt': 0,
+        'users_history': {},
+    }
+    for i in range(trades_array.shape[0]):
+        row = trades_array[i]
+        block = row[BLOCK]
+        subject = row[SUBJECT]
+        if subject not in users['users']:
+            users['users'][subject] = True
+            users['users_cnt'] += 1
+        users['users_history'][block] = users['users_cnt']
+    return users
 
 
 def get_cached_supplies_dict(trades_array: np.ndarray or None) -> Dict[str, int]:
@@ -58,6 +76,17 @@ def get_cached_holders_dict(trades_array: np.ndarray or None) -> Dict[str, Dict[
         amount = row[SHARE_AMOUNT] * multiplier
         cached_holders[subject][trader] += amount
     return cached_holders
+
+
+def update_users_dict(prev_users: Dict[str, Any], trades: List[Trade]) -> Dict[str, int]:
+    for trade in trades:
+        block = trade.block
+        subject = trade.subject
+        if subject not in prev_users['users']:
+            prev_users['users'][subject] = True
+            prev_users['users_cnt'] += 1
+        prev_users['users_history'][block] = prev_users['users_cnt']
+    return prev_users
 
 
 def make_supplies_dict(trades: List[Trade]) -> Dict[str, int]:
@@ -95,13 +124,32 @@ def get_top_supplies(supplies: Dict[str, int], n: int) -> Dict[str, int]:
     return dict(sorted(supplies.items(), key=itemgetter(1), reverse=True)[:n])
 
 
+def extract_n_users_history(users_history: Dict[str, int], n: int = 50) -> List[List[int]]:
+    history = []
+    users_history_len = len(users_history)
+    resample_n = math.ceil(users_history_len / (n - 1))
+    i = 0
+    for block, users_cnt in users_history.items():
+        if i % resample_n == 0 or i == users_history_len - 1:
+            history.append([block, users_cnt])
+        i += 1
+    return history
+
+
 if __name__ == '__main__':
     trades_array = get_cached_trades_array()
     last_updated_block = trades_array[-1][BLOCK]
     print(last_updated_block)
     
+    users = get_cached_users_dict(trades_array)
     holders = get_cached_holders_dict(trades_array)
     supplies = get_cached_supplies_dict(trades_array)
     
     top_supplies = get_top_supplies(supplies, 10)
     print(top_supplies)
+    
+    print(users['users_cnt'])
+    
+    users_history = extract_n_users_history(users['users_history'])
+    print(users_history)
+    print(len(users_history))

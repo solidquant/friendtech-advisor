@@ -1,6 +1,7 @@
 import zmq
 import json
 import asyncio
+import datetime
 import aioprocessing
 
 from web3 import Web3
@@ -15,11 +16,14 @@ from subjects import (
 from web_data import (
     BLOCK,
     get_cached_trades_array,
+    get_cached_users_dict,
     get_cached_supplies_dict,
     get_cached_holders_dict,
+    update_users_dict,
     update_supplies_dict,
     update_holders_dict,
     get_price_history_of_subject,
+    extract_n_users_history,
     get_top_supplies,
 )
 from constants import (
@@ -39,8 +43,10 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
     w3 = Web3(Web3.HTTPProvider(BASE_ALCHEMY_URL))
     
     cached_trades_array = get_cached_trades_array()
+    users = get_cached_users_dict(cached_trades_array)
     supplies = get_cached_supplies_dict(cached_trades_array)
     
+    last_trades = deque(maxlen=20)
     last_hundred_blocks = deque(maxlen=100)
     last_updated_block = cached_trades_array[-1, BLOCK]
     
@@ -59,20 +65,25 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                                             block_number,
                                             2000)
                 last_hundred_blocks.append(new_trades)
+                users = update_users_dict(users, new_trades)
                 supplies = update_supplies_dict(supplies, new_trades)
                 
                 # Publish newly created TXs
-                trades_list = []
                 for trade in new_trades:
                     if trade.block == block_number:
                         multiplier = 1 if trade.is_buy else -1
                         amount = trade.share_amount * multiplier
-                        trades_list.append({
+                        new_trade = {
+                            'block': trade.block,
                             'trader': trade.trader,
                             'subject': trade.subject,
                             'amount': amount,
                             'supply': trade.supply,
-                        })
+                        }
+                        last_trades.append(new_trade)
+                        
+                # Get users history
+                users_history = extract_n_users_history(users['users_history'])
                         
                 # Get top 100 subjects
                 top_supplies = get_top_supplies(supplies, 100)
@@ -80,12 +91,15 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 msg = {
                     'type': 'new_block',
                     'block': block_number,
-                    'txs': trades_list,
+                    'txs': list(reversed(last_trades)),
+                    'users_history': users_history,
                     'top_supplies': top_supplies,
                 }
                 socket.send_string(json.dumps(msg))
                 last_updated_block = block_number
-                print(msg)
+                
+                now = datetime.datetime.now()
+                print(f'[{now}] Block #{block_number}')
         except Exception as e:
             print(e)
 
