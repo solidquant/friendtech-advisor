@@ -1,7 +1,7 @@
 import { Navbar, Stats, Top, Transactions } from "./components";
 import io from 'socket.io-client';
 
-const socket = io.connect(process.env.HOST, {reconnect: true});
+const socket = io.connect(process.env.REACT_APP_HOST, {reconnect: true});
 
 function App() {
   return (
