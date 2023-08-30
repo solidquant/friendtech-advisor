@@ -57,6 +57,7 @@ def get_all_trades(w3: Web3, from_block: int, to_block: int):
     trades = []
     for event in events:
         block = event.blockNumber
+        tx_hash = event.transactionHash.hex()
         args = event.args
         trade = Trade(args.trader,
                         args.subject,
@@ -66,6 +67,7 @@ def get_all_trades(w3: Web3, from_block: int, to_block: int):
                         args.protocolEthAmount,
                         args.subjectEthAmount,
                         args.supply,
-                        block)
+                        block,
+                        tx_hash)
         trades.append(trade)
     return trades

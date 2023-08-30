@@ -2,9 +2,11 @@ import zmq
 import json
 import asyncio
 import datetime
+import requests
 import aioprocessing
 
 from web3 import Web3
+from typing import Any, Dict
 from functools import partial
 from collections import deque
 
@@ -33,6 +35,18 @@ from constants import (
 )
 
 
+def get_subject_info_lite(subject: str) -> Dict[str, Any]:
+    url = f'https://prod-api.kosetto.com/users/{subject}'
+    res = requests.get(url)
+    info = res.json()
+    return {
+        'twitter_username': info['twitterUsername'],
+        'twitter_name': info['twitterName'],
+        'twitter_uid': info['twitterUserId'],
+        'twitter_img': info['twitterPfpUrl'],
+    }
+
+
 async def event_handler(event_queue: aioprocessing.AioQueue):
     port = 7777
     
@@ -42,9 +56,17 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
     
     w3 = Web3(Web3.HTTPProvider(BASE_ALCHEMY_URL))
     
+    top_info = {}
+    
     cached_trades_array = get_cached_trades_array()
     users = get_cached_users_dict(cached_trades_array)
     supplies = get_cached_supplies_dict(cached_trades_array)
+    top_supplies = get_top_supplies(supplies, 10)
+    
+    for subject, _ in top_supplies.items():
+        if subject not in top_info:
+            top_info[subject] = get_subject_info_lite(subject)
+            print(f'{subject} data retrieved')
     
     last_trades = deque(maxlen=20)
     last_hundred_blocks = deque(maxlen=100)
@@ -78,6 +100,7 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                         new_trade = {
                             'ts': int(now.timestamp() * 1000),
                             'block': trade.block,
+                            'tx_hash': trade.tx_hash,
                             'trader': trade.trader,
                             'subject': trade.subject,
                             'amount': amount,
@@ -89,14 +112,25 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 users_history = extract_n_users_history(users['users_history'])
                         
                 # Get top 100 subjects
-                top_supplies = get_top_supplies(supplies, 100)
+                top_supplies = get_top_supplies(supplies, 10)
+                
+                top_supplies_formatted = []
+                for subject, supply in top_supplies.items():
+                    if subject not in top_info:
+                        top_info[subject] = get_subject_info_lite(subject)
+                        print(f'{subject} data retrieved')
+                    top_supplies_formatted.append({
+                        'subject': subject,
+                        'supply': supply,
+                        **top_info[subject]
+                    })
                         
                 msg = {
                     'type': 'new_block',
                     'block': block_number,
                     'txs': list(reversed(last_trades)),
                     'users_history': users_history,
-                    'top_supplies': top_supplies,
+                    'top_supplies': top_supplies_formatted,
                 }
                 socket.send_string(json.dumps(msg))
                 last_updated_block = block_number

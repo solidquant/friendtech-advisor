@@ -30,7 +30,8 @@ class Trade:
                  protocol_eth_amount: int,
                  subject_eth_amount: int,
                  supply: int,
-                 block: int):
+                 block: int,
+                 tx_hash: str):
         
         self.trader = trader
         self.subject = subject
@@ -41,6 +42,7 @@ class Trade:
         self.subject_eth_amount = subject_eth_amount
         self.supply = supply
         self.block = block
+        self.tx_hash = tx_hash
         
     def cache_row(self):
         return [
@@ -52,7 +54,8 @@ class Trade:
             self.protocol_eth_amount,
             self.subject_eth_amount,
             self.supply,
-            self.block
+            self.block,
+            self.tx_hash,
         ]
         
         
@@ -78,7 +81,8 @@ def load_cached_trades() -> (int, List[Trade]):
                           protocol_eth_amount=int(row[5]),
                           subject_eth_amount=int(row[6]),
                           supply=int(row[7]),
-                          block=int(row[8]))
+                          block=int(row[8]),
+                          tx_hash=row[9])
             trades.append(trade)
             from_block = max(trade.block, from_block)  # last updated block
             
@@ -90,7 +94,7 @@ def cache_synced_trades(trades: List[Trade], last_block: int = 0):
     if not os.path.exists(file):
         f = open(file, 'w', newline='')
         wr = csv.writer(f)
-        columns = ['trader', 'subject', 'is_buy', 'share_amount', 'eth_amount', 'protocol_eth_amount', 'subject_eth_amount', 'supply', 'block']
+        columns = ['trader', 'subject', 'is_buy', 'share_amount', 'eth_amount', 'protocol_eth_amount', 'subject_eth_amount', 'supply', 'block', 'tx_hash']
         wr.writerow(columns)
         for trade in trades:
             wr.writerow(trade.cache_row())
@@ -136,6 +140,7 @@ def load_from_range(w3: Web3,
         events = ft.events.Trade.get_logs(fromBlock=params[0], toBlock=params[1])
         for event in events:
             block = event.blockNumber
+            tx_hash = event.transactionHash.hex()
             args = event.args
             trade = Trade(args.trader,
                           args.subject,
@@ -145,7 +150,8 @@ def load_from_range(w3: Web3,
                           args.protocolEthAmount,
                           args.subjectEthAmount,
                           args.supply,
-                          block)
+                          block,
+                          tx_hash)
             trades.append(trade)
     
     return trades

@@ -1,7 +1,7 @@
 const Navbar = () => {
     return (
         <div className="Navbar">
-            Friend.tech Advisor
+            Friend.tech Visualizer
         </div>
     );
 }

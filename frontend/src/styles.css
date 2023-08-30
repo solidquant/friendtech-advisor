@@ -13,6 +13,12 @@ html {
   font-size: 14px;
 }
 
+a {
+  text-decoration: none;
+  color: black;
+  cursor: point;
+}
+
 .App {
   margin: 1rem;
 }
@@ -33,6 +39,15 @@ html {
   margin-bottom: 0.5rem;
 }
 
+.items {
+  margin-top: 0.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .Stats {
   padding: 1rem 0;
   width: 100%;
@@ -47,6 +62,51 @@ html {
   height: 100%;
 }
 
+.Top {
+  padding: 1rem 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.Top .items .top-ranker {
+  width: 90%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #f1c40f;
+  border-radius: 5px;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.Top .items .top-ranker:hover {
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.Top .items .top-ranker .ranker-twitter {
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.ranker-twitter a {
+  display: flex;
+  align-items: center;
+  color: #636e72;
+}
+
+.ranker-twitter a:hover {
+  color: black;
+}
+
+.Top .items .top-ranker img {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
 .Transactions {
   padding: 1rem 0;
   width: 100%;
@@ -56,22 +116,13 @@ html {
   align-items: center;
 }
 
-.Transactions .items {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
 .Transactions .items .block-txs {
   width: 90%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .block-txs .block-num {
@@ -113,8 +164,12 @@ html {
 }
 
 .tx .tx-subject {
-  color: #2d3436;
   margin: 0.5rem 0;
+}
+
+.tx .tx-subject a {
+  text-decoration: none;
+  color: #2d3436;
 }
 
 .tx p {

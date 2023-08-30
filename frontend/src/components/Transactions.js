@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
+import utils from './utils';
+
 TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 
@@ -42,19 +44,12 @@ const BlockTransactions = ({ block, txs }) => {
                 ▪️ Block #{block.toLocaleString()} <span>{time} ago</span>
             </div>
             {
-                filteredTxs.map(tx => (
-                    <SingleTransaction tx={tx} />
+                filteredTxs.map((tx, idx) => (
+                    <SingleTransaction key={idx} tx={tx} />
                 ))
             }
         </div>
     );
-};
-
-const getPrice = (supply, amount) => {
-    let sum1 = (supply == 0) ? 0 : (supply - 1) * supply * (2 * (supply - 1) + 1) / 6;
-    let sum2 = (supply == 0 && amount == 1) ? 0 : (supply - 1 + amount) * (supply + amount) * (2 * (supply - 1 + amount) + 1) / 6;
-    let summation = sum2 - sum1;
-    return summation * (10 ** 18) / 16000;
 };
 
 const SingleTransaction = ({ tx }) => {
@@ -63,7 +58,7 @@ const SingleTransaction = ({ tx }) => {
 
     if (tx.trader == tx.subject && tx.amount == 1 && tx.supply == 1) {
         event = 'User Registered 👋';
-        eventColor = {background: '#2d3436', color: 'white'};
+        eventColor = {background: '#2d3436', color: 'white', paddingLeft: '0.5rem', paddingRight: '0.5rem' };
     } else if (tx.amount < 0) {
         event = `SELL: ${Math.abs(tx.amount)}`;
         eventColor = {color: '#F45532', fontWeight: 'bold'};
@@ -72,7 +67,7 @@ const SingleTransaction = ({ tx }) => {
         eventColor = {color: '#00b894', fontWeight: 'bold'};
     }
 
-    let price = getPrice(tx.supply, 1) / (10 ** 18);
+    let price = utils.getPrice(tx.supply, 1) / (10 ** 18);
 
     return (
         <div className="tx">
@@ -83,7 +78,9 @@ const SingleTransaction = ({ tx }) => {
                     </div>
                 )
             }
-            <div className="tx-subject">🔑 {tx.subject}</div>
+            <div className="tx-subject">
+                <a  href={`https://basescan.org/tx/${tx.tx_hash}`} target="_blank">🔑 {tx.subject}</a>
+            </div>
             <div className="tx-supply">
                 Supply: <span style={{fontWeight: 'bold'}}>{tx.supply}</span> / Price: <span style={{fontWeight: 'bold'}}>{price} ETH</span>
             </div>
