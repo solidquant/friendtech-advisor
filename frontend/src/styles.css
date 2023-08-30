@@ -36,7 +36,6 @@ html {
 .Stats {
   padding: 1rem 0;
   width: 100%;
-  /* height: 25rem; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -48,7 +47,7 @@ html {
   height: 100%;
 }
 
-.Trending {
+.Transactions {
   padding: 1rem 0;
   width: 100%;
   display: flex;
@@ -57,17 +56,69 @@ html {
   align-items: center;
 }
 
-.Trending .items {
+.Transactions .items {
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 0.5rem;
 }
 
-.SubjectItem {
+.Transactions .items .block-txs {
   width: 90%;
-  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.block-txs .block-num {
+  width: 100%;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.block-txs .block-num span {
+  margin-left: 1rem;
+  color: #636e72;
+  font-weight: 300;
+  font-size: 0.8rem;
+}
+
+.tx {
+  cursor: pointer;
+  width: 100%;
+  padding: 0.3rem;
+  border: 1px solid #f2f2f2;
+  border-radius: 7px;
+  margin-bottom: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+}
+
+.tx:hover {
+  box-shadow: rgba(0, 0, 0, 0.15) 3px 3px 5px;
+}
+
+.tx .tx-event {
+  margin: 0.3rem;
+}
+
+.tx .tx-event span {
+  padding: 0.3rem;
+  border-radius: 5px;
+}
+
+.tx .tx-subject {
+  color: #2d3436;
+  margin: 0.5rem 0;
+}
+
+.tx p {
+  color: #989d9e;
 }
 
 @media screen and (min-width: 750px) {

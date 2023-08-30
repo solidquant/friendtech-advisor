@@ -68,12 +68,15 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 users = update_users_dict(users, new_trades)
                 supplies = update_supplies_dict(supplies, new_trades)
                 
+                now = datetime.datetime.now()
+                
                 # Publish newly created TXs
                 for trade in new_trades:
                     if trade.block == block_number:
                         multiplier = 1 if trade.is_buy else -1
                         amount = trade.share_amount * multiplier
                         new_trade = {
+                            'ts': int(now.timestamp() * 1000),
                             'block': trade.block,
                             'trader': trade.trader,
                             'subject': trade.subject,
@@ -98,7 +101,6 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 socket.send_string(json.dumps(msg))
                 last_updated_block = block_number
                 
-                now = datetime.datetime.now()
                 print(f'[{now}] Block #{block_number}')
         except Exception as e:
             print(e)
