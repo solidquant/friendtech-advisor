@@ -108,8 +108,8 @@ a {
 }
 
 .top-ranker .ranker-subject {
-  overflow: scroll;
-  overflow-x: hidden;
+  width: 100%;
+  overflow: hidden;
 }
 
 .Transactions {
@@ -170,8 +170,8 @@ a {
 
 .tx .tx-subject {
   margin: 0.5rem 0;
-  overflow: scroll;
-  overflow-x: hidden;
+  width: 100%;
+  overflow: hidden;
 }
 
 .tx .tx-subject a {
@@ -181,7 +181,8 @@ a {
 
 .tx p {
   color: #989d9e;
-  overflow: scroll;
+  width: 100%;
+  overflow: hidden;
 }
 
 @media screen and (min-width: 750px) {
