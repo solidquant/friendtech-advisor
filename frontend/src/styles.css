@@ -107,6 +107,10 @@ a {
   margin-right: 0.5rem;
 }
 
+.top-ranker .ranker-subject {
+  overflow: scroll;
+}
+
 .Transactions {
   padding: 1rem 0;
   width: 100%;
@@ -165,6 +169,7 @@ a {
 
 .tx .tx-subject {
   margin: 0.5rem 0;
+  overflow: scroll;
 }
 
 .tx .tx-subject a {
@@ -174,6 +179,7 @@ a {
 
 .tx p {
   color: #989d9e;
+  overflow: scroll;
 }
 
 @media screen and (min-width: 750px) {

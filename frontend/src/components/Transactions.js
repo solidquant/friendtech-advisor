@@ -14,10 +14,6 @@ const Transactions = ({ socket }) => {
         socket.on('event', (evt) => {
             setTxs(evt.txs);
         });
-
-        socket.on('transaction', (tx) => {
-            console.log(tx);
-        });
     }, []);
 
     return (
