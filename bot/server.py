@@ -69,6 +69,7 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
             print(f'{subject} data retrieved')
     
     last_trades = deque(maxlen=20)
+    last_trades_tx_hash = deque(maxlen=20)
     last_hundred_blocks = deque(maxlen=100)
     last_updated_block = cached_trades_array[-1, BLOCK]
     
@@ -93,8 +94,9 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 now = datetime.datetime.now()
                 
                 # Publish newly created TXs
+                newly_added = 0
                 for trade in new_trades:
-                    if trade.block == block_number:
+                    if trade.tx_hash not in last_trades_tx_hash:
                         multiplier = 1 if trade.is_buy else -1
                         amount = trade.share_amount * multiplier
                         new_trade = {
@@ -107,6 +109,12 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                             'supply': trade.supply,
                         }
                         last_trades.append(new_trade)
+                        last_trades_tx_hash.append(trade.tx_hash)
+                        socket.send_string(json.dumps({
+                            'type': 'new_tx',
+                            'tx': new_trade,
+                        }))
+                        newly_added += 1
                         
                 # Get users history
                 users_history = extract_n_users_history(users['users_history'])
@@ -135,7 +143,7 @@ async def event_handler(event_queue: aioprocessing.AioQueue):
                 socket.send_string(json.dumps(msg))
                 last_updated_block = block_number
                 
-                print(f'[{now}] Block #{block_number}')
+                print(f'[{now}] Block #{block_number}: {newly_added} txs')
         except Exception as e:
             print(e)
 

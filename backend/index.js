@@ -20,7 +20,12 @@ io.on('connection', (socket) => {
     sock.connect(`tcp://127.0.0.1:${port}`);
     sock.subscribe('');
     sock.on('message', function(message) {
-        socket.emit('event', JSON.parse(message));
+        const data = JSON.parse(message);
+        if (data.type == 'new_block') {
+            socket.emit('event', data);
+        } else if (data.type == 'new_tx') {
+            socket.emit('transaction', data);
+        }
     });
     CONNECTIONS[id] = sock;
     console.log(`[OPEN: ${id}] Connections: ${Object.keys(CONNECTIONS).length}`);
