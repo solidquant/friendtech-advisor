@@ -109,6 +109,7 @@ a {
 
 .top-ranker .ranker-subject {
   overflow: scroll;
+  overflow-x: hidden;
 }
 
 .Transactions {
@@ -170,6 +171,7 @@ a {
 .tx .tx-subject {
   margin: 0.5rem 0;
   overflow: scroll;
+  overflow-x: hidden;
 }
 
 .tx .tx-subject a {
